@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>mule</title>
+		<meta charset="utf-8">
+    		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    		<meta name="color-scheme" content="dark light">
+		<style>
+			.container {
+				margin: 0 auto;
+				max-width: 600px;
+			}
+			
+			.header {
+				margin-bottom: 1em;
+			}
+			
+			.header h1 {
+				margin: 0;
+			}
+			
+			.item {
+				border: 1px dashed black;
+				
+			}
+			
+			.important {
+				background-color: #FFFFE2;
+			}
+			
+			.item .data {
+				margin-top: 0;
+			}
+			
+			.item .text {
+				white-space: pre-wrap;
+			}
+			
+			.item img {
+				border: 1px solid lightgray;
+				margin: 5px 0;
+				max-width: 300px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<center class="header">
+				<h1>Kanye Updates</h1>
+				<small>Updates from the WestSubEver and Kanye West Discord servers.</small>
+			</center>
+		
+			{% for message in messages %}
+			<div class="item{% if message.ping %} important{% endif %}">
+				<p class="data"><b><small>{{ message.date }} &middot; {{ message.guild }} &middot; #{{ message.channel }}</small></b></p>
+				<div class="text">{{ message.text }}</div>
+				{% for attachment in message.attachments %}
+				{% if attachment.img %}
+				<img src="{{ attachment.url }}" />
+				{% else %}
+				<p><code>{{ attachment.url }}</code></p>
+				{% endif %}
+				{% endfor %}
+			</div>
+			{% endfor %}
+		</div>
+	</body>
+</html>

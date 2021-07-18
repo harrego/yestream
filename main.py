@@ -32,9 +32,13 @@ async def on_message(message):
 	content = message.content
 	attachments = message.attachments
 	
-	guild_id = str(message.guild.id)
-	guild_name = message.guild.name
+	
 	message_id = message.id
+	message_date = int(message.created_at.timestamp())
+	guild_id = str(message.guild.id)
+	guild_channel = message.channel.name
+	guild_name = message.guild.name
+
 	if len(content) > 0 or len(attachments) > 0:
 		if len(content) <= 0:
 			content = None
@@ -46,12 +50,12 @@ async def on_message(message):
 		if (len(attachments) > 0):
 			print("    + " + str(len(attachments)) + " attachments")
 		
-		db.write_msg(database, message_id, content, guild_id, guild_name, len(attachments) > 0)
+		db.write_msg(database, message_id, message_date, content, guild_id, guild_name, guild_channel, len(attachments) > 0)
 		
 		for attachment in attachments:
 			(attachment_id, file_name) = img.save(attachment.url)
 			db.write_attachment(database, attachment_id, file_name, message_id)
 
-web.setup(bot)
+web.setup(bot, database)
 bot.run(DISCORD_TOKEN)
 db.close(database)
