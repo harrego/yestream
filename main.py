@@ -1,12 +1,14 @@
 import math
 import discord
+from discord.ext import commands
 import os
 import db
 import img
+import web
 
 database = db.connect()
 
-client = discord.Client()
+bot = commands.Bot(command_prefix=".")
 env = os.environ
 
 DISCORD_TOKEN = env.get("DISCORD_TOKEN")
@@ -18,11 +20,11 @@ else:
 
 print(CHANS)
 
-@client.event
+@bot.event
 async def on_ready():
     print("Logged in")
 
-@client.event
+@bot.event
 async def on_message(message):
 	if message.channel.id not in CHANS:
 		return
@@ -34,15 +36,22 @@ async def on_message(message):
 	guild_name = message.guild.name
 	message_id = message.id
 	if len(content) > 0 or len(attachments) > 0:
-		print("[msg][" + guild_id + "] " + content)
-		#if (len(attachments) > 0):
-		#	print("    + " + str(len(attachments) + " attachments")
+		if len(content) <= 0:
+			content = None
 			
-		db.write_msg(database, message_id, content, guild_id, guild_name)
+		print_content = content
+		if print_content == None:
+			print_content = "no message content"
+		print("[msg][" + guild_id + "] " + print_content)
+		if (len(attachments) > 0):
+			print("    + " + str(len(attachments)) + " attachments")
+		
+		db.write_msg(database, message_id, content, guild_id, guild_name, len(attachments) > 0)
 		
 		for attachment in attachments:
 			(attachment_id, file_name) = img.save(attachment.url)
 			db.write_attachment(database, attachment_id, file_name, message_id)
 
-client.run(DISCORD_TOKEN)
+web.setup(bot)
+bot.run(DISCORD_TOKEN)
 db.close(database)
