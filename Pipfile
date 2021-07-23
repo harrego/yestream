@@ -8,9 +8,11 @@ requests = "*"
 "discord.py-self" = "*"
 boto3 = "*"
 aiohttp = "*"
-jinja2 = "*"
+Jinja2 = "*"
 aiohttp-jinja2 = "*"
 pytz = "*"
+beautifulsoup4 = "*"
+python-twitter = "*"
 
 [dev-packages]
 

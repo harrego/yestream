@@ -36,9 +36,28 @@
 				white-space: pre-wrap;
 			}
 			
-			.item img {
+			.item img,.item video {
 				border: 1px solid lightgray;
 				margin: 5px 0;
+				max-width: 300px;
+			}
+			
+			.embed p {
+				margin: 0;
+			}
+			
+			.embed .date {
+				margin-bottom: 1em;
+			}
+			
+			.embed {
+				margin: 10px 0;
+				background-color: #f0f0f0;
+				padding: 3px;
+				max-width: 600px;
+			}
+			
+			.embed.tweet {
 				max-width: 300px;
 			}
 		</style>
@@ -53,12 +72,30 @@
 			{% for message in messages %}
 			<div class="item{% if message.ping %} important{% endif %}">
 				<p class="data"><b><small>{{ message.date }} &middot; {{ message.guild }} &middot; #{{ message.channel }}</small></b></p>
-				<div class="text">{{ message.text }}</div>
+				<div class="text">{{ message.text|urlize }}</div>
+				
+				{% for tweet in message.tweets %}
+				<div class="embed tweet">
+					<b><p class="name">{{ tweet.name }} <a href="https://twitter.com/{{ tweet.username }}"><small>@{{ tweet.username }}</small></p></b></a>
+					<a href="https://twitter.com/{{ tweet.username }}/status/{{ tweet.id }}"><small><p class="date">{{ tweet.date }}</p></small></a>
+					<p class="text">{{ tweet.text|urlize }}</p>
+				</div>
+				{% endfor %}
+				
+				{% if message.attachments|length > 0 %}
+				<p><small><b>Attachments</b></small></p>
+				{% endif %}
 				{% for attachment in message.attachments %}
-				{% if attachment.img %}
+				{% if attachment.type == "vid" %}
+				<video controls>
+					<source src="{{ attachment.url }}" type="video/mp4">
+				</video>
+				{% endif %}
+				
+				{% if attachment.type == "img" %}
 				<img src="{{ attachment.url }}" />
 				{% else %}
-				<p><code>{{ attachment.url }}</code></p>
+				<small><p><a href="{{ attachment.url }}">[{{ attachment.file_name }}]</a></p></small>
 				{% endif %}
 				{% endfor %}
 			</div>

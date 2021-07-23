@@ -31,8 +31,13 @@ class Webserver(commands.Cog):
 		def parse_db_msgs(msg):
 			# format date
 			eastern_tz = pytz.timezone("US/Eastern")
+			
 			time = msg["date"].astimezone(eastern_tz)
 			msg["date"] = time.strftime("%B %-d, %Y - %-I:%M%p %Z")
+			
+			for tweet in msg["tweets"]:	
+				tweet_time = tweet["date"].astimezone(eastern_tz)
+				tweet["date"] = time.strftime("%B %-d, %Y - %-I:%M%p %Z")
 			
 			# format text
 			if "text" in msg:
@@ -44,10 +49,13 @@ class Webserver(commands.Cog):
 			for attachment in msg["attachments"]:
 				attachment["url"] = "/static/" + attachment["id"] + "/" + attachment["file_name"]
 				(filename, extension) = os.path.splitext(attachment["file_name"])
+				extension = extension.lower()
 				if extension == ".png" or extension == ".jpg" or extension == ".jpeg" or extension == ".gif":
-					attachment["img"] = True
+					attachment["type"] = "img"
+				elif extension == ".mp4":
+					attachment["type"] = "vid"
 				else:
-					attachment["img"] = False
+					attachment["type"] = None
 			return msg
 			
 		@routes.get("/")

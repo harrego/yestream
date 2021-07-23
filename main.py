@@ -5,11 +5,34 @@ import os
 import db
 import img
 import web
+import re
+import time
+from datetime import datetime
+import math
+import metadata
+import html
 
 database = db.connect()
 
-bot = commands.Bot(command_prefix=".")
 env = os.environ
+
+# twitter setup
+def twitter_env_setup():
+	TWITTER_KEYS = ["TWITTER_CONSUMER_KEY", "TWITTER_CONSUMER_SECRET", "TWITTER_ACCESS_TOKEN_KEY", "TWITTER_ACCESS_TOKEN_SECRET"]
+	args = []
+	for KEY in TWITTER_KEYS:
+		value = env.get(KEY)
+		print(value)
+		if value == None:
+			return None
+		args.append(value)
+	return metadata.twitter_setup(*args)
+twitter_api = twitter_env_setup()
+if twitter_api:
+	print("[status][twitter] api enabled")
+
+# bot setup
+bot = commands.Bot(command_prefix=".")
 
 DISCORD_TOKEN = env.get("DISCORD_TOKEN")
 CHANS = env.get("DISCORD_CHANS")
@@ -18,11 +41,9 @@ if CHANS:
 else:
 	CHANS = []
 
-print(CHANS)
-
 @bot.event
 async def on_ready():
-    print("Logged in")
+    print("[status][discord] logged in")
 
 @bot.event
 async def on_message(message):
@@ -55,6 +76,30 @@ async def on_message(message):
 		for attachment in attachments:
 			(attachment_id, file_name) = img.save(attachment.url)
 			db.write_attachment(database, attachment_id, file_name, message_id)
+			
+		links = re.findall(r'(https?://[^\s]+)', content)
+		for link in links:
+			# only ignore link if twitter api is active
+			if twitter_api:
+				twitter_search = re.match(r'(https?:\/\/)?(www.)?twitter.com\/\w+\/status\/[0-9]+', link)
+				if twitter_search:
+					continue
+			(title, description) = metadata.site_metadata(link)
+			db.write_link(database, link, int(math.floor(time.time())), title, description)
+			
+		if twitter_api:
+			tweet_ids = metadata.tweet_ids_from_str(content)
+			for tweet_id in tweet_ids:
+				status = metadata.tweet_metadata(twitter_api, tweet_id)
+				if status == None:
+					continue
+					
+				tweet_id = status.id
+				tweet_date = status.created_at_in_seconds
+				tweet_text = html.unescape(status.text)
+				tweet_username = status.user.screen_name
+				tweet_name = status.user.name
+				db.write_tweet(database, tweet_id, tweet_date, tweet_text, tweet_username, tweet_name)	
 
 web.setup(bot, database)
 bot.run(DISCORD_TOKEN)
