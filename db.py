@@ -48,7 +48,7 @@ def write_tweet(db, id, date, text, username, name):
 def get_msgs(db):
 	(con, cur) = db
 	msgs = []
-	for row in con.execute("SELECT id, date, text, guild_name, guild_channel, attachments FROM messages ORDER BY date DESC LIMIT 25"):
+	for row in con.execute("SELECT id, date, text, guild_name, guild_channel, attachments FROM messages ORDER BY date DESC LIMIT 150"):
 		msg = {
 			"date": datetime.datetime.fromtimestamp(row[1]),
 			"guild": row[3],

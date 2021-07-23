@@ -93,7 +93,7 @@
 				{% endif %}
 				
 				{% if attachment.type == "img" %}
-				<img src="{{ attachment.url }}" />
+				<a href="{{ attachment.url }}"><img src="{{ attachment.url }}" /></a>
 				{% else %}
 				<small><p><a href="{{ attachment.url }}">[{{ attachment.file_name }}]</a></p></small>
 				{% endif %}
