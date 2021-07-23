@@ -10,9 +10,11 @@ def twitter_setup(consumer_key, consumer_secret, access_token_key, access_token_
 			consumer_secret=consumer_secret,
 			access_token_key=access_token_key,
 			access_token_secret=access_token_secret)
-		return twitter_api
+		if twitter_api.VerifyCredentials():
+			return twitter_api
+		else:
+			return None
 	except Exception as error:
-		print(error)
 		return None
 
 def site_metadata(url):

@@ -2,6 +2,7 @@ import sqlite3
 import datetime
 import re
 import metadata
+import html
 
 def connect():
 	con = sqlite3.connect("db.sqlite3")
@@ -37,15 +38,25 @@ def write_attachment(db, id, file_name, message_id):
 	
 def write_link(db, url, date, title, description):
 	(con, cur) = db
-	cur.execute("INSERT OR IGNORE INTO links VALUES (?, ?, ?, ?)", (url, date, title, description))
+	cur.execute("INSERT OR REPLACE INTO links VALUES (?, ?, ?, ?)", (url, date, title, description))
 	con.commit()
 
 def write_tweet(db, id, date, text, username, name):
 	(con, cur) = db
 	cur.execute("INSERT OR IGNORE INTO tweets VALUES (?, ?, ?, ?, ?)", (id, date, text, username, name))
 	con.commit()
+	
+def write_raw_tweet(db, status):
+	(con, cur) = db
+	
+	tweet_id = status.id
+	tweet_date = status.created_at_in_seconds
+	tweet_text = html.unescape(status.text)
+	tweet_username = status.user.screen_name
+	tweet_name = status.user.name
+	write_tweet(db, tweet_id, tweet_date, tweet_text, tweet_username, tweet_name)	
 
-def get_msgs(db):
+def get_msgs(db, twitter_api=None):
 	(con, cur) = db
 	msgs = []
 	for row in con.execute("SELECT id, date, text, guild_name, guild_channel, attachments FROM messages ORDER BY date DESC LIMIT 150"):
@@ -76,6 +87,13 @@ def get_msgs(db):
 				cur.execute("SELECT id, date, text, username, name FROM tweets WHERE id=?", (tweet_id,))
 				row = cur.fetchone()
 				if row == None:
+					print("fetching missing tweet")
+					if twitter_api:
+						print("have api")
+						status = metadata.tweet_metadata(twitter_api, tweet_id)
+						if status:
+							("have status")
+							write_raw_tweet(db, status)
 					continue
 				tweets.append({
 					"id": row[0],

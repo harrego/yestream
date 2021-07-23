@@ -17,18 +17,16 @@ app.router.add_static('/static/', STATIC_PATH, name='static')
 
 aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(os.path.join(os.getcwd(), "templates")))
 
-def setup(bot, database):
-	bot.add_cog(Webserver(bot, database))
+def setup(bot, database, twitter_api):
+	bot.add_cog(Webserver(bot, database, twitter_api))
 	
 class Webserver(commands.Cog):
-	def __init__(self, bot, database):
+	def __init__(self, bot, database, twitter_api):
 		self.bot = bot
 		self.web_server.start()
-		
-		self.database = database
-		(con, cur) = database
 			
-		def parse_db_msgs(msg):
+		def parse_db_msgs(database, msg):
+			(con, cur) = database
 			# format date
 			eastern_tz = pytz.timezone("US/Eastern")
 			
@@ -60,13 +58,18 @@ class Webserver(commands.Cog):
 			
 		@routes.get("/")
 		async def index(request):
-			msgs = db.get_msgs(database)
-			msgs = map(parse_db_msgs, msgs)
+			database = request.app["database"]
+			twitter_api = request.app["twitter_api"]
+			
+			msgs = db.get_msgs(database, twitter_api)
+			msgs = map(lambda msg: parse_db_msgs(database, msg), msgs)
 		
 			context = { "messages": msgs }
 			response = aiohttp_jinja2.render_template("index.html", request, context=context)
 			return response
-			
+		
+		app["database"] = database
+		app["twitter_api"] = twitter_api
 		app.add_routes(routes)
 		
 	@tasks.loop()

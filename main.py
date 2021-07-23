@@ -10,7 +10,6 @@ import time
 from datetime import datetime
 import math
 import metadata
-import html
 
 database = db.connect()
 
@@ -22,12 +21,12 @@ def twitter_env_setup():
 	args = []
 	for KEY in TWITTER_KEYS:
 		value = env.get(KEY)
-		print(value)
 		if value == None:
 			return None
 		args.append(value)
 	return metadata.twitter_setup(*args)
 twitter_api = twitter_env_setup()
+print(twitter_api)
 if twitter_api:
 	print("[status][twitter] api enabled")
 
@@ -93,14 +92,8 @@ async def on_message(message):
 				status = metadata.tweet_metadata(twitter_api, tweet_id)
 				if status == None:
 					continue
-					
-				tweet_id = status.id
-				tweet_date = status.created_at_in_seconds
-				tweet_text = html.unescape(status.text)
-				tweet_username = status.user.screen_name
-				tweet_name = status.user.name
-				db.write_tweet(database, tweet_id, tweet_date, tweet_text, tweet_username, tweet_name)	
+				db.write_raw_tweet(database, status)
 
-web.setup(bot, database)
+web.setup(bot, database, twitter_api)
 bot.run(DISCORD_TOKEN)
 db.close(database)
