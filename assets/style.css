@@ -1,0 +1,248 @@
+:root {
+	color-scheme: light dark;
+}
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+	background-color: #fff;
+	color: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+	body {
+		background-color: #1e1e1e;
+		color: #fff;
+	}
+}
+
+a {
+	color: inherit;
+	text-decoration: underline;
+	font-weight: inherit;
+}
+
+.no-hover:hover {
+	background-color: inherit !important;
+}
+
+img,video {
+	width: 100%;
+	max-width: 400px;
+}
+
+/* Helper classes */
+
+.flex-col {
+	display: flex;
+	flex-direction: column;
+}
+
+.flex-row {
+	display: flex;
+	flex-direction: row;
+}
+
+.flex-justify-center {
+	justify-content: center;
+}
+
+.flex-justify-space-between {
+	justify-content: space-between;
+}
+
+.flex-align-center {
+	align-items: center;
+}
+
+.p-margin-0 p {
+	margin: 0;
+}
+
+.subtext {
+	color: #8E8E8E;
+}
+
+@media (prefers-color-scheme: dark) {
+	.subtext {
+		color: #737373;
+	}
+}
+
+/* Header */
+
+.content {
+	padding: 0 13px;
+	margin: 26px auto;
+	max-width: 500px;
+}
+
+.header-avatar {
+	width: 50px;
+	height: 50px;
+	background-color: black;
+}
+
+.header-description {
+	text-align: center;
+	width: 150px;
+	margin: 0;
+	margin-top: 10px;
+	font-size: 1em;
+}
+
+.header-links {
+	margin-top: 15px;
+	display: flex;
+	flex-direction: row;
+	gap: 10px;
+}
+
+.header-links p {
+	margin: 0;
+	font-size: smaller;
+}
+
+/* Info */
+
+.info {
+	margin-top: 35px;
+}
+
+/* Post */
+
+.posts {
+	margin-top: 45px;
+}
+
+.posts .post:nth-child(even) {
+	background: #fff;
+}
+
+.posts .post:nth-child(odd) {
+	background-color: #F7F7F7;
+}
+
+.post-gray {
+	background-color: #F7F7F7;
+}
+
+.post {
+	box-sizing: border-box;
+	padding: 12px;
+	border-radius: 5px;
+}
+
+.post-auto-width {
+	align-self: flex-start;
+}
+
+.post:nth-child(even) a:hover {
+	background-color: #F7F7F7;
+}
+
+.post:nth-child(odd) a:hover {
+	background-color: #fff;
+}
+
+.posts .post:nth-child(even) .post {
+	background-color: #F7F7F7;
+}
+
+.posts .post:nth-child(even) .post a:hover {
+	background-color: #fff;
+}
+
+.posts .post:nth-child(odd) .post {
+	background-color: #fff;
+}
+
+.posts .post:nth-child(odd) .post a:hover {
+	background-color: #f7f7f7;
+}
+
+@media (prefers-color-scheme: dark) {
+	.post:nth-child(even) a:hover {
+		background-color: #272727;
+	}
+
+	.post:nth-child(odd) a:hover {
+		background-color: #1e1e1e;
+	}
+
+	.posts .post:nth-child(even) {
+		background: #1e1e1e;
+	}
+
+	.posts .post:nth-child(odd) {
+		background-color: #272727;
+	}
+
+	.post-gray {
+		background-color: #272727;
+	}
+
+	.posts .post:nth-child(even) .post {
+		background-color: #272727;
+	}
+	
+	.posts .post:nth-child(even) .post a:hover {
+		background-color: #1e1e1e;
+	}
+
+	.posts .post:nth-child(odd) .post {
+		background-color: #1e1e1e;
+	}
+	
+	.posts .post:nth-child(odd) .post a:hover {
+		background-color: #272727;
+	}
+}
+
+.post-content {
+	margin: 0 0 16px 0;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.post-content p {
+	overflow-wrap: break-word;
+}
+
+.post-content-compact {
+	gap: 6px;
+	margin: 0;
+}
+
+.post-content img,
+.post-content video {
+	border-radius: 5px;
+	border: 1px solid #ECECEC;
+}
+
+@media (prefers-color-scheme: dark) {
+	.post-content img,
+	.post-content video {
+		border: 1px solid #303030;
+	}
+}
+
+.post-header {
+	margin-bottom: 16px;
+}
+
+.post-header-name {
+	font-weight: 600;
+}
+
+.post-header-username {
+	margin-left: 6px !important;
+}
+
+.post-link-title {
+	font-weight: 600;
+}
+
+.post-footer p {
+	font-size: 15px;
+}

@@ -1,105 +1,123 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<title>mule</title>
-		<meta charset="utf-8">
-    		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    		<meta name="color-scheme" content="dark light">
-		<style>
-			.container {
-				margin: 0 auto;
-				max-width: 600px;
-			}
-			
-			.header {
-				margin-bottom: 1em;
-			}
-			
-			.header h1 {
-				margin: 0;
-			}
-			
-			.item {
-				border: 1px dashed black;
-				
-			}
-			
-			.important {
-				background-color: #FFFFE2;
-			}
-			
-			.item .data {
-				margin-top: 0;
-			}
-			
-			.item .text {
-				white-space: pre-wrap;
-			}
-			
-			.item img,.item video {
-				border: 1px solid lightgray;
-				margin: 5px 0;
-				max-width: 300px;
-			}
-			
-			.embed p {
-				margin: 0;
-			}
-			
-			.embed .date {
-				margin-bottom: 1em;
-			}
-			
-			.embed {
-				margin: 10px 0;
-				background-color: #f0f0f0;
-				padding: 3px;
-				max-width: 600px;
-			}
-			
-			.embed.tweet {
-				max-width: 300px;
-			}
-		</style>
-	</head>
-	<body>
-		<div class="container">
-			<center class="header">
-				<h1>Kanye Updates</h1>
-				<small>Updates from the WestSubEver and Kanye West Discord servers.</small>
-			</center>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="assets/style.css">
+  <link rel="icon" type="image/png" href="assets/favicon-16x16.png" sizes="16x16">
+  <link rel="icon" type="image/png" href="assets/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="assets/favicon-96x96.png" sizes="96x96">
+  <meta property="og:title" content="Ye Stream" />
+  <meta property="og:description" content="Ye updates from multiple sources" />
+  <meta property="og:url" content="http://ye.harry.city" />
+  <title>Ye Stream</title>
+</head>
+<body>
+	<div class="content">
+		<header class="flex-col flex-align-center">
+			<div class="header-avatar"></div>
+			<p class="header-description">Ye updates from multiple sources</p>
+			<div class="header-links">
+				<a href="https://github.com/harrego/yestream/blob/main/README.md"><p class="header-about">About</p></a>
+				<p>|</p>
+				<a href="https://harry.city"><p class="header-home">harry.city</p></a>
+			</div>
+		</header>
 		
-			{% for message in messages %}
-			<div class="item{% if message.ping %} important{% endif %}">
-				<p class="data"><b><small>{{ message.date }} &middot; {{ message.guild }} &middot; #{{ message.channel }}</small></b></p>
-				<div class="text">{{ message.text|urlize }}</div>
-				
-				{% for tweet in message.tweets %}
-				<div class="embed tweet">
-					<b><p class="name">{{ tweet.name }} <a href="https://twitter.com/{{ tweet.username }}"><small>@{{ tweet.username }}</small></p></b></a>
-					<a href="https://twitter.com/{{ tweet.username }}/status/{{ tweet.id }}"><small><p class="date">{{ tweet.date }}</p></small></a>
-					<p class="text">{{ tweet.text|urlize }}</p>
+		<div class="info">
+			<!-- Pinned -->
+			<div class="post post-gray p-margin-0">
+				<div class="post-header flex-row p-margin-0">
+					<p class="post-header-name">colin</p>
+					<p class="post-header-username subtext"><a href="https://twitter.com/colinags">@colinags</a></p>
 				</div>
-				{% endfor %}
+				<div class="post-content">
+					<p>We’ve entered the all black BALENCIDONDA era</p>
+				</div>
+				<div class="post-footer flex-row flex-justify-space-between subtext">
+					<p class="post-footer-date"><a href="https://twitter.com/colinags/status/1435579379493621760">September 8, 2021 - 8:22AM ET</a></p>
+					<p class="post-footer-tags">Pinned</p>
+				</div>
+			</div>
+		</div>
+		
+		<div class="posts">	
+			<!-- Posts -->
+			{% for message in messages %}
+			<div class="post p-margin-0">
+
+				<div class="post-content">
+					{% if message.text|length > 0 %}
+					<p>{{ message.text|urlize }}</p>
+					{% endif %}
+					
+					{% for link in message.links %}
+						{% if link.title %}
+						<div class="post p-margin-0">
+							<div class="post-content post-content-compact">
+								<a href="{{ link.url }}"><p class="post-link-title">{{ link.title }}</p></a>
+								{% if link.description %}
+								<p class="post-link-description">{{ link.description }}</p>
+								{% endif %}
+							</div>
+						</div>
+						{% endif %}
+					{% endfor %}
 				
-				{% if message.attachments|length > 0 %}
-				<p><small><b>Attachments</b></small></p>
-				{% endif %}
-				{% for attachment in message.attachments %}
-				{% if attachment.type == "vid" %}
-				<video controls>
-					<source src="{{ attachment.url }}" type="video/mp4">
-				</video>
-				{% endif %}
+					{% for tweet in message.tweets %}
+					<div class="post p-margin-0">
+						<div class="post-header flex-row p-margin-0">
+							<p class="post-header-name">{{ tweet.name }}</p>
+							<p class="post-header-username subtext"><a href="https://twitter.com/{{ tweet.username }}">@{{ tweet.username }}</a></p>
+						</div>
+						<div class="post-content">
+							<p>{{ tweet.text|urlize }}</p>
+						</div>
+						<div class="post-footer flex-row flex-justify-space-between subtext">
+							<p class="post-footer-date"><a href="{{ tweet.url }}">{{ tweet.date }}</a></p>
+						</div>
+					</div>
+					{% endfor %}
+					
+					{% for attachment in message.attachments %}
+					{% if attachment.type == "vid" %}
+					<video controls>
+						<source src="{{ attachment.url }}" type="video/mp4">
+					</video>
+					<div class="post post-auto-width p-margin-0">
+						<div class="post-content post-content-compact">
+							<a href="{{ attachment.url }}"><p class="post-file-name">{{ attachment.file_name }}</p></a>
+							{% if attachment.file_size_human %}
+							<p class="post-file-size subtext">{{ attachment.file_size_human }}</p>
+							{% else %}
+							<p class="post-file-size subtext">Unknown file size</p>
+							{% endif %}
+						</div>
+					</div>
+					{% elif attachment.type == "img" %}
+					<a class="no-hover" href="{{ attachment.url }}"><img src="{{ attachment.url }}"></a>
+					{% else %}
+					<div class="post post-auto-width p-margin-0">
+						<div class="post-content post-content-compact">
+							<a href="{{ attachment.url }}"><p class="post-file-name">{{ attachment.file_name }}</p></a>
+							{% if attachment.file_size_human %}
+							<p class="post-file-size subtext">{{ attachment.file_size_human }}</p>
+							{% else %}
+							<p class="post-file-size subtext">Unknown file size</p>
+							{% endif %}
+						</div>
+					</div>
+					{% endif %}
+					{% endfor %}
+				</div>
 				
-				{% if attachment.type == "img" %}
-				<a href="{{ attachment.url }}"><img src="{{ attachment.url }}" /></a>
-				{% else %}
-				<small><p><a href="{{ attachment.url }}">[{{ attachment.file_name }}]</a></p></small>
-				{% endif %}
-				{% endfor %}
+				<div class="post-footer flex-row flex-justify-space-between subtext">
+					<p class="post-footer-date">{{ message.date }}</p>
+				</div>
 			</div>
 			{% endfor %}
+		
 		</div>
-	</body>
+	</div>
+</body>
 </html>

@@ -137,7 +137,11 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-env.sh
-db.sqlite3
 static/
-*.old
+*.sqlite3
+
+.git/
+.gitignore
+
+preview.png
+env.sh

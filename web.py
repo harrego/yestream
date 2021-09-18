@@ -1,6 +1,8 @@
 import os
 import db
 
+import img
+
 import pytz
 
 from aiohttp import web
@@ -9,11 +11,23 @@ from discord.ext import commands, tasks
 import jinja2
 import aiohttp_jinja2
 
+env = os.environ
+
+HOST="0.0.0.0"
+if "HOST" in env:
+	HOST=env["HOST"]
+PORT=3000
+if "PORT" in env:
+	PORT=int(env["PORT"])
+
 app = web.Application()
 routes = web.RouteTableDef()
 
 STATIC_PATH = os.path.join(os.path.dirname(__file__), "static")
 app.router.add_static('/static/', STATIC_PATH, name='static')
+
+ASSETS_PATH = os.path.join(os.path.dirname(__file__), "assets")
+app.router.add_static('/assets/', ASSETS_PATH, name='assets')
 
 aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(os.path.join(os.getcwd(), "templates")))
 
@@ -24,18 +38,19 @@ class Webserver(commands.Cog):
 	def __init__(self, bot, database, twitter_api):
 		self.bot = bot
 		self.web_server.start()
+		print("[status][web server] started at " + HOST + ":" + str(PORT))
 			
 		def parse_db_msgs(database, msg):
 			(con, cur) = database
 			# format date
-			eastern_tz = pytz.timezone("US/Eastern")
+			eastern_tz = pytz.timezone("America/New_York")
 			
 			time = msg["date"].astimezone(eastern_tz)
-			msg["date"] = time.strftime("%B %-d, %Y - %-I:%M%p %Z")
+			msg["date"] = time.strftime("%B %-d, %Y - %-I:%M%p ET")
 			
 			for tweet in msg["tweets"]:	
 				tweet_time = tweet["date"].astimezone(eastern_tz)
-				tweet["date"] = time.strftime("%B %-d, %Y - %-I:%M%p %Z")
+				tweet["date"] = tweet_time.strftime("%B %-d, %Y - %-I:%M%p ET")
 			
 			# format text
 			if "text" in msg:
@@ -54,6 +69,10 @@ class Webserver(commands.Cog):
 					attachment["type"] = "vid"
 				else:
 					attachment["type"] = None
+					
+				if attachment["file_size"]:
+					attachment["file_size_human"] = img.human_file_size(attachment["file_size"])
+					
 			return msg
 			
 		@routes.get("/")
@@ -76,7 +95,7 @@ class Webserver(commands.Cog):
 	async def web_server(self):
 		runner = web.AppRunner(app)
 		await runner.setup()
-		site = web.TCPSite(runner, host='0.0.0.0', port=3000)
+		site = web.TCPSite(runner, host=HOST, port=PORT)
 		await site.start()
 		
 	@web_server.before_loop
